@@ -66,6 +66,32 @@ async function run() {
       res.send(result);
     });
 
+    // Api for update order
+    app.patch("/api/v1/update-order", async (req, res) => {
+      const updatedOrder = req.body;
+
+      // Construct the $set object dynamically
+      const updateDoc = {
+        $set: {},
+      };
+
+      // Check if each field in updatedOrder exists and add it to the $set object
+      if (updatedOrder.name) {
+        updateDoc.$set.name = updatedOrder.name;
+      }
+
+      if (updatedOrder.email) {
+        updateDoc.$set.email = updatedOrder.email;
+      }
+
+      if (updatedOrder.shipping) {
+        updateDoc.$set.shipping = updatedOrder.shipping;
+      }
+      const query = { orderID: updatedOrder.orderId };
+      const result = await orderCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     //   Searching order
     app.get("/api/v1/orders", async (req, res) => {
       const { query, orderType, status } = req.query;
