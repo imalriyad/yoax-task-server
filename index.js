@@ -88,7 +88,6 @@ async function run() {
         if (orderType) {
           filter.orderType = orderType.toLowerCase(); // Assuming orderType is passed as a query parameter
         }
-
         if (status) {
           filter.status = status.toLowerCase(); // Assuming status is passed as a query parameter
         }
@@ -101,6 +100,25 @@ async function run() {
         console.error("Error retrieving orders:", error);
         res.status(500).json({ error: "Internal Server Error" });
       }
+    });
+
+    // api for pagination
+    app.get("/api/v1/total-order", async (req, res) => {
+      const totalOrder = await orderCollection.estimatedDocumentCount();
+      res.send({ totalOrder });
+    });
+
+    // paginations
+    app.get("/api/v1/order", async (req, res) => {
+      const page = parseInt(req.query.page);
+      const size = parseInt(req.query.size);
+      const skip = page * size;
+      const result = await orderCollection
+        .find()
+        .skip(skip)
+        .limit(size)
+        .toArray();
+      res.send(result);
     });
 
     //   Api for delteing order
